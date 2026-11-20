@@ -1,0 +1,942 @@
+[
+  {
+    "id": "i001",
+    "text": "I can't tell if the cart saved my changes or not.",
+    "screen": "Cart",
+    "raw_screen_key": "cart_screen",
+    "author": "Maya Chen",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i002",
+    "text": "Updating the quantity doesn't change the total until I reload.",
+    "screen": "Cart",
+    "raw_screen_key": "cart_screen",
+    "author": "Jon Bell",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i003",
+    "text": "There should be a way to see the full order summary before I start checking out.",
+    "screen": "Cart",
+    "raw_screen_key": "cart_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.3",
+    "gold_type": "improvement",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i004",
+    "text": "Is the number at the bottom with tax or without? It isn't labelled.",
+    "screen": "Cart",
+    "raw_screen_key": "cart_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i005",
+    "text": "I kept looking for a promo code field. It would help to show it before the payment step.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Tess Howard",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i006",
+    "text": "The total changed after I selected express delivery and I didn't understand why.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Owen King",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i007",
+    "text": "Which step am I on? There's no indication of how many are left.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Priya Raman",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i008",
+    "text": "Let me go back a step without losing what I already typed.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i009",
+    "text": "Pressing back took me all the way out of checkout and emptied the form.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i010",
+    "text": "I don't know what happens when I press Continue. Does it charge me?",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Marco Silva",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i011",
+    "text": "The button says Continue on every screen so I never know what's coming next.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Ruth Adeyemi",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i012",
+    "text": "The order summary collapsed on its own and I couldn't get it back.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Sam Okafor",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i013",
+    "text": "Show me the final amount at every step, not just at the end.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Maya Chen",
+    "build": "1.8.3",
+    "gold_type": "improvement",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i014",
+    "text": "Is express delivery guaranteed or just an estimate? It isn't clear.",
+    "screen": "Delivery",
+    "raw_screen_key": "delivery_screen",
+    "author": "Jon Bell",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i015",
+    "text": "I'd like to see the delivery cost before I pick an option, not after.",
+    "screen": "Delivery",
+    "raw_screen_key": "delivery_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i016",
+    "text": "Choosing standard delivery sometimes resets my address selection.",
+    "screen": "Delivery",
+    "raw_screen_key": "delivery_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i017",
+    "text": "Am I done? The screen just sat there after I pressed Pay.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Tess Howard",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i018",
+    "text": "Tell me what I'm being charged right next to the Pay button.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Owen King",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Checkout feels confusing"
+  },
+  {
+    "id": "i019",
+    "text": "Do you store my card? I couldn't find anything that said either way.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Priya Raman",
+    "build": "1.8.3",
+    "gold_type": "question",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i020",
+    "text": "A line about security near the card field would make me more comfortable.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.3",
+    "gold_type": "improvement",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i021",
+    "text": "It said my card was declined but the bank app showed the charge went through.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i022",
+    "text": "Apple Pay failed twice and then my card worked straight away.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Marco Silva",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i023",
+    "text": "Why do you need the billing address again? I already entered it.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Ruth Adeyemi",
+    "build": "1.8.3",
+    "gold_type": "question",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i024",
+    "text": "The card form rejected a perfectly valid number three times.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Sam Okafor",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i025",
+    "text": "Show which cards are accepted before I start typing one in.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Maya Chen",
+    "build": "1.8.3",
+    "gold_type": "improvement",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i026",
+    "text": "Is this page secure? There's no padlock or anything like it.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Jon Bell",
+    "build": "1.8.2",
+    "gold_type": "question",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i027",
+    "text": "I got charged but no confirmation email arrived for twenty minutes.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i028",
+    "text": "Let me save a card for next time. Typing it every order is tedious.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.3",
+    "gold_type": "improvement",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i029",
+    "text": "What happens if the payment fails halfway? Do I lose the order?",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Tess Howard",
+    "build": "1.8.3",
+    "gold_type": "question",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i030",
+    "text": "The CVV field wouldn't accept my input on the first try.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Owen King",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i031",
+    "text": "The error just said invalid. Tell me which field is wrong.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Priya Raman",
+    "build": "1.8.3",
+    "gold_type": "improvement",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i032",
+    "text": "Apple Pay was quick once it worked. That part felt reassuring.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.3",
+    "gold_type": "praise",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i033",
+    "text": "If delivery changes the price, when exactly am I charged?",
+    "screen": "Delivery",
+    "raw_screen_key": "delivery_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.3",
+    "gold_type": "question",
+    "gold_theme": "Payment confidence"
+  },
+  {
+    "id": "i034",
+    "text": "Please add a dark mode. I shop in bed and this is blinding.",
+    "screen": "Settings",
+    "raw_screen_key": "settings_screen",
+    "author": "Marco Silva",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i035",
+    "text": "A theme setting would be great, even just follow-the-system.",
+    "screen": "Settings",
+    "raw_screen_key": "settings_screen",
+    "author": "Ruth Adeyemi",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i036",
+    "text": "Is dark mode planned? I couldn't find it anywhere in settings.",
+    "screen": "Settings",
+    "raw_screen_key": "settings_screen",
+    "author": "Sam Okafor",
+    "build": "1.8.1",
+    "gold_type": "question",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i037",
+    "text": "Every other app I use has a dark theme now.",
+    "screen": "Settings",
+    "raw_screen_key": "settings_screen",
+    "author": "Maya Chen",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i038",
+    "text": "Let the app follow my phone's appearance setting automatically.",
+    "screen": "Settings",
+    "raw_screen_key": "settings_screen",
+    "author": "Jon Bell",
+    "build": "1.8.0",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i039",
+    "text": "The white background at night is really harsh on the eyes.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i040",
+    "text": "Dark mode would make the product photos stand out more.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i041",
+    "text": "Does this support dark mode? It stays white for me.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Tess Howard",
+    "build": "1.8.0",
+    "gold_type": "question",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i042",
+    "text": "Checkout is the brightest screen in the app at night.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Owen King",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i043",
+    "text": "A darker theme here would be easier to read in low light.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Priya Raman",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i044",
+    "text": "The address list is a wall of white. Dark mode would help.",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i045",
+    "text": "Product pages would look much better on a dark background.",
+    "screen": "Product",
+    "raw_screen_key": "product_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i046",
+    "text": "Add dark mode, the photos get washed out against all that white.",
+    "screen": "Product",
+    "raw_screen_key": "product_screen",
+    "author": "Marco Silva",
+    "build": "1.8.0",
+    "gold_type": "improvement",
+    "gold_theme": "Dark mode requests"
+  },
+  {
+    "id": "i047",
+    "text": "Asking me to create an account before I can look around put me off.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Ruth Adeyemi",
+    "build": "1.8.2",
+    "gold_type": "improvement",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i048",
+    "text": "Why do you need my phone number just to browse?",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Sam Okafor",
+    "build": "1.8.2",
+    "gold_type": "question",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i049",
+    "text": "The verification code took four minutes to arrive and then expired.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Maya Chen",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i050",
+    "text": "Let me skip the tour. I just wanted to find one thing.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Jon Bell",
+    "build": "1.8.2",
+    "gold_type": "improvement",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i051",
+    "text": "The keyboard covered the password field and I couldn't scroll.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i052",
+    "text": "Four screens before I saw a single product is three too many.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.2",
+    "gold_type": "improvement",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i053",
+    "text": "What are the notification permissions actually for? It asked immediately.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Tess Howard",
+    "build": "1.8.1",
+    "gold_type": "question",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i054",
+    "text": "Sign in with Apple bounced me back to the start twice.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Owen King",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i055",
+    "text": "Ask for the permissions when you need them, not all at once up front.",
+    "screen": "Onboarding",
+    "raw_screen_key": "onboarding_screen",
+    "author": "Priya Raman",
+    "build": "1.8.1",
+    "gold_type": "improvement",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i056",
+    "text": "After signing up I landed somewhere I didn't recognise. Where am I?",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.2",
+    "gold_type": "question",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i057",
+    "text": "Nothing explained what to do first once I got in.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.2",
+    "gold_type": "improvement",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i058",
+    "text": "The welcome banner wouldn't dismiss and covered the first row.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Marco Silva",
+    "build": "1.8.1",
+    "gold_type": "bug",
+    "gold_theme": "Onboarding friction"
+  },
+  {
+    "id": "i059",
+    "text": "This new saved addresses flow is so much faster. Really nice update!",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Ruth Adeyemi",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i060",
+    "text": "Can I change the delivery address after placing the order?",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Sam Okafor",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i061",
+    "text": "Editing an address created a duplicate instead of replacing it.",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Maya Chen",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i062",
+    "text": "Let me label addresses. Home and Work would be enough.",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Jon Bell",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i063",
+    "text": "My default address keeps reverting to an old one I deleted.",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i064",
+    "text": "Postcode lookup would save a lot of typing here.",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i065",
+    "text": "Good that it remembered my address from last time.",
+    "screen": "Addresses",
+    "raw_screen_key": "addresses_screen",
+    "author": "Tess Howard",
+    "build": "1.8.4",
+    "gold_type": "praise",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i066",
+    "text": "The address picker showed addresses I'd already removed.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Owen King",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i067",
+    "text": "I'd like to add a new address without leaving checkout.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Priya Raman",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i068",
+    "text": "Does changing the address here change it on my account too?",
+    "screen": "Delivery",
+    "raw_screen_key": "delivery_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i069",
+    "text": "It delivered the old address even though I changed it at checkout.",
+    "screen": "Delivery",
+    "raw_screen_key": "delivery_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Address management"
+  },
+  {
+    "id": "i070",
+    "text": "Searching for the exact product name returns nothing.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Marco Silva",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i071",
+    "text": "Let me filter by size without opening three menus.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Ruth Adeyemi",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i072",
+    "text": "Results change order every time I come back to them.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Sam Okafor",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i073",
+    "text": "How is this sorted? It doesn't look like relevance.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Maya Chen",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i074",
+    "text": "Spelling it slightly wrong gives zero results. Be more forgiving.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Jon Bell",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i075",
+    "text": "Out of stock items are mixed in with everything else.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.3",
+    "gold_type": "bug",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i076",
+    "text": "Show how many results there are, not just an endless scroll.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i077",
+    "text": "Clearing a filter also cleared my search term.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Tess Howard",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i078",
+    "text": "Recent searches would save me retyping the same thing.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Owen King",
+    "build": "1.8.3",
+    "gold_type": "improvement",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i079",
+    "text": "Why does the same search give different results on wifi and data?",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Priya Raman",
+    "build": "1.8.4",
+    "gold_type": "question",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i080",
+    "text": "The search box is hidden behind an icon. Make it visible.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.4",
+    "gold_type": "improvement",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i081",
+    "text": "Are the recommendations personalised or the same for everyone?",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.3",
+    "gold_type": "question",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i082",
+    "text": "Tapping a result sometimes opens a different product.",
+    "screen": "Product",
+    "raw_screen_key": "product_screen",
+    "author": "Marco Silva",
+    "build": "1.8.4",
+    "gold_type": "bug",
+    "gold_theme": "Search results quality"
+  },
+  {
+    "id": "i083",
+    "text": "The home screen takes five or six seconds to show anything.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Ruth Adeyemi",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i084",
+    "text": "Images load one by one and the layout jumps around while they do.",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Sam Okafor",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i085",
+    "text": "Is it meant to be this slow on an older phone?",
+    "screen": "Home",
+    "raw_screen_key": "home_screen",
+    "author": "Maya Chen",
+    "build": "1.8.1",
+    "gold_type": "question",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i086",
+    "text": "There's a long pause after I type before anything happens.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Jon Bell",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i087",
+    "text": "Scrolling the results stutters badly once I'm a page or two down.",
+    "screen": "Search",
+    "raw_screen_key": "search_screen",
+    "author": "Aisha Patel",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i088",
+    "text": "The product page takes ages to open from the list.",
+    "screen": "Product",
+    "raw_screen_key": "product_screen",
+    "author": "Lewis Morgan",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i089",
+    "text": "Swiping between photos is laggy.",
+    "screen": "Product",
+    "raw_screen_key": "product_screen",
+    "author": "Tess Howard",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i090",
+    "text": "The app froze for a few seconds when I zoomed into an image.",
+    "screen": "Product",
+    "raw_screen_key": "product_screen",
+    "author": "Owen King",
+    "build": "1.8.1",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i091",
+    "text": "Load a low-res photo first so there's something to look at.",
+    "screen": "Product",
+    "raw_screen_key": "product_screen",
+    "author": "Priya Raman",
+    "build": "1.8.2",
+    "gold_type": "improvement",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i092",
+    "text": "There's a noticeable delay between each checkout step.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Dan Weiss",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i093",
+    "text": "The spinner stayed on screen long enough that I nearly gave up.",
+    "screen": "Checkout",
+    "raw_screen_key": "checkout_screen",
+    "author": "Lena Fischer",
+    "build": "1.8.1",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  },
+  {
+    "id": "i094",
+    "text": "Confirming payment hung for about ten seconds with no feedback.",
+    "screen": "Payment",
+    "raw_screen_key": "payment_screen",
+    "author": "Marco Silva",
+    "build": "1.8.2",
+    "gold_type": "bug",
+    "gold_theme": "Performance complaints"
+  }
+]

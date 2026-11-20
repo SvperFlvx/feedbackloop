@@ -1,0 +1,39 @@
+# Secrets — never commit any of these.
+# The service-role key in particular bypasses every row-level security policy
+# in supabase/migrations/0002_rls.sql, which is the only thing standing between
+# an anon key and one client seeing another client's unreleased screens.
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+*.p12
+*.mobileprovision
+*.cer
+secrets/
+
+# Supabase local
+supabase/.branches/
+supabase/.temp/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Node, if the site or tooling lands here
+node_modules/
+dist/
+build/
+.next/
+
+# Python, for the eval harness
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Eval output — scores are reproducible, and raw model responses can be large
+eval/results/
