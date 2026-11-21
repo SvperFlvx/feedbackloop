@@ -58,6 +58,20 @@ hollow-dot encoding says a theme has gone quiet. If a model reshuffles its
 themes every time it runs, both break — an owner sees colours move and themes
 appear to vanish when nothing changed. A spread above 0.05 gets a warning.
 
+## A rule about the data
+
+**Real customer feedback never goes in `dataset/items.json`.**
+
+The first time grouping fails on a real project, the obvious fix is to drop
+that customer's items into the evaluation set so you can test against reality.
+Don't. That would put confidential feedback about an unreleased product into a
+git repository, permanently, where every future contributor can read it.
+
+Reproduce the *shape* of the failure with invented items instead — two themes
+that should have merged, a note containing three separate complaints, whatever
+went wrong. The harness tests mechanics, and a synthetic reconstruction tests
+them just as well.
+
 ## What this cannot tell you
 
 **The data is invented.** The 94 items match the counts in the Figma prototype
