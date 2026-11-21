@@ -30,6 +30,34 @@ ROOT = pathlib.Path(__file__).parent.parent
 PUBLIC_FIELDS = ("id", "text", "screen", "build", "author")
 
 
+def load_env_file():
+    """Read keys from a .env file so they never have to be typed into a shell.
+
+    Pasting a key at a prompt is a reliable way to leak it: it lands in shell
+    history, in scrollback, and in anything you paste the terminal into. A file
+    you edit once and never open again is both safer and less annoying.
+
+    Looked for next to the harness, beside it, and in the current directory.
+    Existing environment variables always win, so CI is unaffected.
+    """
+    seen = []
+    for candidate in (ROOT / ".env", ROOT.parent / ".env", pathlib.Path(".env")):
+        if not candidate.is_file():
+            continue
+        for line in candidate.read_text().splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and value and key not in os.environ:
+                os.environ[key] = value
+                seen.append(key)
+        return candidate, seen
+    return None, seen
+
+
 def load_items():
     return json.loads((ROOT / "dataset" / "items.json").read_text())
 
@@ -82,6 +110,10 @@ def main() -> int:
                          "break persistence and the colour-per-theme rule.")
     ap.add_argument("--compare", nargs="*", help="score files to tabulate instead of running")
     args = ap.parse_args()
+
+    env_file, loaded = load_env_file()
+    if env_file and loaded:
+        print(f"read {', '.join(loaded)} from {env_file}")
 
     if args.compare:
         rows = []
