@@ -31,6 +31,9 @@ ROOT = pathlib.Path(__file__).parent.parent
 PUBLIC_FIELDS = ("id", "text", "screen", "build", "author")
 
 
+KEY_VARS = ("ANTHROPIC_API_KEY", "OPENAI_API_KEY", "GOOGLE_API_KEY", "GROQ_API_KEY")
+
+
 def load_env_file():
     """Read keys from a .env file so they never have to be typed into a shell.
 
@@ -38,10 +41,14 @@ def load_env_file():
     history, in scrollback, and in anything you paste the terminal into. A file
     you edit once and never open again is both safer and less annoying.
 
+    The file WINS over whatever is already in the environment. That is the
+    opposite of the usual convention, and deliberate: a key exported into a
+    shell session hours ago is invisible, outlives the reason it was set, and
+    survives being revoked. The file is the thing you just edited on purpose,
+    so it is the thing that should take effect. Nothing here runs in CI.
+
     Looked for next to the harness, beside it, and in the current directory.
-    Existing environment variables always win, so CI is unaffected.
     """
-    seen = []
     for candidate in (ROOT / ".env", ROOT.parent / ".env", pathlib.Path(".env")):
         if not candidate.is_file():
             continue
@@ -50,13 +57,28 @@ def load_env_file():
             if not line or line.startswith("#") or "=" not in line:
                 continue
             key, value = line.split("=", 1)
-            key = key.strip()
-            value = value.strip().strip('"').strip("'")
-            if key and value and key not in os.environ:
+            key, value = key.strip(), value.strip().strip('"').strip("'")
+            if key and value:
                 os.environ[key] = value
-                seen.append(key)
-        return candidate, seen
-    return None, seen
+                os.environ["_SRC_" + key] = str(candidate)
+        return candidate
+    return None
+
+
+def report_key_source():
+    """Say where each key came from, and show enough of it to tell two apart.
+
+    A silent key is the thing that wasted an afternoon: a revoked key in the
+    shell and a good key in the file look identical from the outside, and the
+    only symptom is a 401 that says nothing about which one was sent. Four
+    characters is enough to tell them apart and not enough to use.
+    """
+    for var in KEY_VARS:
+        value = os.environ.get(var)
+        if not value:
+            continue
+        source = os.environ.get("_SRC_" + var, "the shell environment")
+        print(f"{var}: ...{value[-4:]}  (from {source})")
 
 
 def load_items():
@@ -112,9 +134,9 @@ def main() -> int:
     ap.add_argument("--compare", nargs="*", help="score files to tabulate instead of running")
     args = ap.parse_args()
 
-    env_file, loaded = load_env_file()
-    if env_file and loaded:
-        print(f"read {', '.join(loaded)} from {env_file}")
+    load_env_file()
+    if args.provider != "mock":
+        report_key_source()
 
     if args.compare:
         rows = []
