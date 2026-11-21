@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>FeedbackLoop — leave a note</title>
+<!--
+  A test instrument, not a product surface.
+
+  Its only job is to collect real audio feedback from real people on real
+  screens, so the grain question can be answered with something other than
+  invented data. It is deliberately plain: no design system, no polish, no
+  states beyond honest ones. It gets deleted with the two quarantined tables
+  when the test has answered its question.
+
+  Nothing here is a conclusion about capture UX. A browser cannot do on-device
+  transcription, cannot hold a recording button the way a native app can, and
+  does not share the system permissions model. UX observations from this page
+  get retested on the real thing rather than adopted from a stand-in.
+
+  The publishable key below is public by design. It grants nothing: both
+  capture tables deny every role, and the only way in is two token-validated
+  functions. See migrations 0006 to 0008.
+-->
+<style>
+  :root {
+    --bg: #0d0e12; --panel: #171a21; --line: #272b36;
+    --ink: #eef0f4; --soft: #9aa1b1; --accent: #1b5fb0; --live: #b3302f; --mark: #2a78d6;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  body { padding: env(safe-area-inset-top) 16px calc(16px + env(safe-area-inset-bottom)); }
+  main { max-width: 560px; margin: 0 auto; }
+  h1 { font-size: 17px; font-weight: 600; margin: 18px 0 2px; }
+  p.sub { color: var(--soft); font-size: 14px; margin: 0 0 18px; }
+  .card { background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+  label.field { display: block; font-size: 13px; color: var(--soft);
+    margin-bottom: 8px; }
+
+  /* The screen. A placeholder frame until the real prototype images are in:
+     swapping it is one line, and the marker maths is already fractional. */
+  #stage { position: relative; width: 100%; aspect-ratio: 9 / 19.5;
+    background: #1e222b;
+    border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
+    touch-action: manipulation; }
+  #stage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #stage .hint { position: absolute; inset: 0; display: grid; place-content: center;
+    text-align: center; color: var(--soft); font-size: 14px; padding: 24px; }
+  #pin { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px;
+    border-radius: 50%; border: 2px solid #fff; background: rgba(42,120,214,.78);
+    display: none; pointer-events: none; }
+
+  select, textarea, button { font: inherit; color: var(--ink); }
+  select, textarea { width: 100%; background: #10131a; border: 1px solid var(--line);
+    border-radius: 10px; padding: 11px 12px; }
+  textarea { min-height: 92px; resize: vertical; }
+
+  .row { display: flex; gap: 10px; }
+  button { border: 0; border-radius: 12px; padding: 15px 16px; font-weight: 600;
+    background: #222733; cursor: pointer; }
+  button[disabled] { opacity: .45; cursor: default; }
+  #rec { flex: 1; background: var(--accent); font-size: 17px; }
+  #rec.live { background: var(--live); }
+  #send { width: 100%; background: #1f6f3f; font-size: 17px; margin-top: 4px; }
+  #again { background: transparent; border: 1px solid var(--line); color: var(--soft); }
+
+  .meta { display: flex; justify-content: space-between; align-items: center;
+    color: var(--soft); font-size: 13px; margin-top: 10px; }
+  .note { color: var(--soft); font-size: 12.5px; margin: 10px 2px 0; }
+  .err { color: #ff9c9c; font-size: 14px; margin: 10px 2px 0; }
+  .ok { text-align: center; padding: 34px 10px; }
+  .ok b { display: block; font-size: 19px; margin-bottom: 8px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <div id="boot" class="card">Opening your link…</div>
+
+  <div id="app" class="hidden">
+    <h1 id="greet"></h1>
+    <p class="sub">Tap the thing that bugs you, then say what's wrong.</p>
+
+    <div class="card">
+      <label class="field" for="screen">Which screen?</label>
+      <select id="screen"></select>
+      <div id="stage" style="margin-top:12px">
+            <div class="hint" id="stagehint">Tap where the problem is</div>
+        <div id="pin"></div>
+      </div>
+      <div class="meta"><span id="pinned">No spot marked yet</span></div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <button id="rec">Hold the thought — record</button>
+        <button id="again" class="hidden">Redo</button>
+      </div>
+      <div class="meta"><span id="timer">Up to about four minutes</span></div>
+      <div id="transwrap" class="hidden" style="margin-top:12px">
+        <label class="field" for="trans">What we heard — fix anything that's wrong</label>
+        <textarea id="trans" placeholder="Your words will appear here"></textarea>
+      </div>
+      <p class="note" id="typehint">Prefer to type? Record nothing and just write it below.</p>
+      <div id="typewrap" style="margin-top:4px">
+        <textarea id="typed" placeholder="Or type it here instead"></textarea>
+      </div>
+      <button id="send" disabled>Send it</button>
+      <div id="err" class="err hidden"></div>
+    </div>
+    <p class="note">Your recording is stored in Canada. It's transcribed by a US
+      service under terms that forbid training on it, and deleted there within 30 days.</p>
+  </div>
+
+  <div id="done" class="card ok hidden">
+    <b>Got it — thank you.</b>
+    <span class="note" id="donecount"></span>
+    <button id="more" style="margin-top:18px;width:100%">Leave another</button>
+  </div>
+</main>
+
+<script>
+const API  = "https://huhysluxumcffqxqzffa.supabase.co";
+const KEY  = "sb_publishable_jOv5l0JUK0ZLY9Hu_RJxkg_9EeA75UA";
+const TOKEN = new URLSearchParams(location.search).get("t") || "";
+
+const $ = id => document.getElementById(id);
+let mark = null, blob = null, mime = "", rec = null, chunks = [], started = 0, tick = null;
+
+function oops(m) { $("err").textContent = m; $("err").classList.remove("hidden"); }
+function clearOops() { $("err").classList.add("hidden"); }
+
+async function rpc(fn, body) {
+  const r = await fetch(`${API}/rest/v1/rpc/${fn}`, {
+    method: "POST",
+    headers: { "apikey": KEY, "Authorization": `Bearer ${KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  const text = await r.text();
+  let data = null; try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!r.ok) throw new Error((data && data.message) || `request failed (${r.status})`);
+  return data;
+}
+
+// ---- open -------------------------------------------------------------
+(async function open() {
+  if (!TOKEN) { $("boot").textContent = "This link is missing its code. Ask for a new one."; return; }
+  try {
+    const me = await rpc("capture_open", { p_token: TOKEN });
+    $("greet").textContent = `Hi ${me.label}.`;
+    const sel = $("screen");
+    const screens = (me.screens && me.screens.length) ? me.screens : ["The app"];
+    sel.innerHTML = screens.map(s => `<option>${s.replace(/</g, "&lt;")}</option>`).join("");
+    sel.onchange = paintScreen;
+    paintScreen();
+    $("boot").classList.add("hidden");
+    $("app").classList.remove("hidden");
+  } catch (e) {
+    $("boot").textContent = e.message || "That link didn't work.";
+  }
+})();
+
+// Real prototype frames drop in here, keyed by screen name. Until then the
+// stage is an empty frame and the marker still records where it was tapped.
+const FRAMES = {};
+function paintScreen() {
+  const name = $("screen").value;
+  const src = FRAMES[name];
+  const old = document.getElementById("shot");
+  if (old) old.remove();
+  if (src) {
+    const img = document.createElement("img");
+    img.id = "shot"; img.alt = `The ${name} screen`; img.src = src;
+    $("stage").prepend(img);
+    $("stagehint").classList.add("hidden");
+  } else {
+    $("stagehint").classList.remove("hidden");
+  }
+  mark = null; $("pin").style.display = "none"; $("pinned").textContent = "No spot marked yet";
+}
+
+// ---- marker -----------------------------------------------------------
+$("stage").addEventListener("click", ev => {
+  const box = ev.currentTarget.getBoundingClientRect();
+  const x = (ev.clientX - box.left) / box.width, y = (ev.clientY - box.top) / box.height;
+  if (x < 0 || x > 1 || y < 0 || y > 1) return;
+  mark = { x: +x.toFixed(4), y: +y.toFixed(4) };
+  const pin = $("pin");
+  pin.style.left = `${x * 100}%`; pin.style.top = `${y * 100}%`; pin.style.display = "block";
+  $("pinned").textContent = "Spot marked — move it by tapping somewhere else";
+  $("stagehint").classList.add("hidden");
+  ready();
+});
+
+// ---- recording --------------------------------------------------------
+function pickMime() {
+  for (const m of ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/aac", ""]) {
+    if (!m || (window.MediaRecorder && MediaRecorder.isTypeSupported(m))) return m;
+  }
+  return "";
+}
+
+$("rec").onclick = async () => {
+  clearOops();
+  if (rec && rec.state === "recording") { rec.stop(); return; }
+  if (!navigator.mediaDevices || !window.MediaRecorder) {
+    oops("This browser can't record. Type it instead and send."); return;
+  }
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch { oops("No microphone access. Allow it in your browser, or type it instead."); return; }
+
+  mime = pickMime();
+  chunks = [];
+  rec = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+  rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  rec.onstop = async () => {
+    clearInterval(tick);
+    stream.getTracks().forEach(t => t.stop());
+    $("rec").classList.remove("live");
+    $("rec").textContent = "Record again";
+    blob = new Blob(chunks, { type: rec.mimeType || mime || "audio/webm" });
+    $("timer").textContent = `${Math.round(blob.size / 1024)} KB recorded`;
+    $("again").classList.remove("hidden");
+    ready();
+    await transcribe();
+  };
+  rec.start();
+  started = Date.now();
+  $("rec").classList.add("live");
+  $("rec").textContent = "Stop";
+  tick = setInterval(() => {
+    const s = Math.floor((Date.now() - started) / 1000);
+    $("timer").textContent = `Recording — ${String(Math.floor(s / 60))}:${String(s % 60).padStart(2, "0")}`;
+    if (s >= 240) rec.stop();
+  }, 250);
+};
+
+$("again").onclick = () => {
+  blob = null; $("transwrap").classList.add("hidden"); $("trans").value = "";
+  $("again").classList.add("hidden"); $("timer").textContent = "Up to about four minutes";
+  $("rec").textContent = "Hold the thought — record"; ready();
+};
+
+async function transcribe() {
+  $("transwrap").classList.remove("hidden");
+  $("trans").value = "";
+  $("trans").placeholder = "Writing that down…";
+  const fd = new FormData();
+  fd.append("token", TOKEN);
+  fd.append("audio", blob, "note." + ((blob.type.split("/")[1] || "webm").split(";")[0]));
+  try {
+    const r = await fetch(`${API}/functions/v1/transcribe`, { method: "POST", body: fd });
+    const out = await r.json().catch(() => null);
+    if (!r.ok) throw new Error((out && out.error) || `transcription failed (${r.status})`);
+    if (out.empty) {
+      $("trans").placeholder = "We couldn't hear anything — type it, or record again";
+    } else {
+      $("trans").value = out.text;
+    }
+  } catch (e) {
+    // The recording is safe either way: it is sent and stored regardless, and
+    // can be transcribed later. Say so rather than implying the note was lost.
+    $("trans").placeholder = "Couldn't write it down just now — send it anyway, or type it here";
+    oops(e.message || "Transcription didn't work. Your recording is still fine to send.");
+  }
+  ready();
+}
+
+// ---- send -------------------------------------------------------------
+function ready() {
+  const words = ($("trans").value || $("typed").value || "").trim();
+  $("send").disabled = !(blob || words);
+}
+$("trans").oninput = ready;
+$("typed").oninput = ready;
+
+const b64 = b => new Promise((res, rej) => {
+  const fr = new FileReader();
+  fr.onload = () => res(String(fr.result).split(",")[1] || "");
+  fr.onerror = () => rej(new Error("couldn't read the recording"));
+  fr.readAsDataURL(b);
+});
+
+$("send").onclick = async () => {
+  clearOops();
+  $("send").disabled = true; $("send").textContent = "Sending…";
+  try {
+    const typed = $("typed").value.trim();
+    const heard = $("trans").value.trim();
+    await rpc("capture_submit", {
+      p_token: TOKEN,
+      p_screen: $("screen").value,
+      p_marker_x: mark ? mark.x : null,
+      p_marker_y: mark ? mark.y : null,
+      p_audio_b64: blob ? await b64(blob) : null,
+      p_audio_mime: blob ? blob.type : null,
+      p_transcript: heard || typed || null,
+      p_typed: !blob && !!typed
+    });
+    const me = await rpc("capture_open", { p_token: TOKEN }).catch(() => null);
+    $("donecount").textContent = me
+      ? `That's ${me.notes_so_far} note${me.notes_so_far === 1 ? "" : "s"} from you.`
+      : "";
+    $("app").classList.add("hidden");
+    $("done").classList.remove("hidden");
+  } catch (e) {
+    oops(e.message || "That didn't send. Try again.");
+    $("send").disabled = false;
+  }
+  $("send").textContent = "Send it";
+};
+
+$("more").onclick = () => {
+  blob = null; mark = null; chunks = [];
+  $("trans").value = ""; $("typed").value = "";
+  $("transwrap").classList.add("hidden"); $("again").classList.add("hidden");
+  $("timer").textContent = "Up to about four minutes";
+  $("rec").textContent = "Hold the thought — record";
+  $("done").classList.add("hidden"); $("app").classList.remove("hidden");
+  paintScreen(); ready();
+};
+</script>
+</body>
+</html>
