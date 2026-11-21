@@ -128,6 +128,25 @@ class ParseFailure(Exception):
         self.raw = raw
 
 
+def attempt_run(provider: str, model: str, items, number: int,
+                tries: int = 2) -> tuple[dict[str, str], str, float]:
+    """Run once, and once more if the provider failed rather than answered.
+
+    A provider error is about the call, not about the grouping, so retrying is
+    free of any effect on the score. A ParseFailure is not retried: the model
+    answered, and the answer is the finding.
+    """
+    for attempt in range(1, tries + 1):
+        try:
+            return run_once(provider, model, items)
+        except providers.ProviderError as e:
+            if attempt == tries:
+                raise
+            print(f"  run {number} attempt {attempt}: {e}", file=sys.stderr)
+            print(f"  retrying run {number}", file=sys.stderr)
+    raise AssertionError("unreachable")
+
+
 def run_once(provider: str, model: str, items) -> tuple[dict[str, str], str, float]:
     payload = strip_gold(items)
     started = time.time()
@@ -175,7 +194,7 @@ def main() -> int:
 
     for n in range(args.repeat):
         try:
-            pred, raw, elapsed = run_once(args.provider, args.model, items)
+            pred, raw, elapsed = attempt_run(args.provider, args.model, items, n + 1)
         except ParseFailure as e:
             out_dir.mkdir(exist_ok=True)
             dump = out_dir / f"unparsed-{stamp}-run{n + 1}.txt"
@@ -187,7 +206,14 @@ def main() -> int:
             return 1
         except providers.ProviderError as e:
             print(f"run {n + 1} failed: {e}", file=sys.stderr)
-            return 1
+            if not runs:
+                return 1
+            # Runs already in hand cost real minutes. A later blip should not
+            # discard them; it should narrow what the summary claims.
+            print(f"  keeping the {len(runs)} run(s) that succeeded. "
+                  f"Spread over fewer runs says less about stability.",
+                  file=sys.stderr)
+            break
         s = metrics.score(pred, gold)
         s["seconds"] = round(elapsed, 1)
         runs.append(s)
@@ -209,13 +235,14 @@ def main() -> int:
     safe = re.sub(r"[^a-zA-Z0-9]+", "-", f"{args.provider}-{args.model}").strip("-")
     out = out_dir / f"{safe}-{stamp}.json"
     out.write_text(json.dumps({
-        "provider": args.provider, "model": args.model, "repeats": args.repeat,
+        "provider": args.provider, "model": args.model,
+        "repeats_asked": args.repeat, "repeats_completed": len(runs),
         "runs": runs, "summary": summary, "raw_responses": raws,
     }, indent=2) + "\n")
 
     print(f'\nmean V-measure {summary["v_measure"]["mean"]:.3f}', end="")
-    if args.repeat > 1:
-        print(f' (spread {summary["v_measure"]["stdev"]:.3f} across {args.repeat} runs)')
+    if len(runs) > 1:
+        print(f' (spread {summary["v_measure"]["stdev"]:.3f} across {len(runs)} runs)')
         if summary["v_measure"]["stdev"] > 0.05:
             print("  warning: unstable. Themes would visibly reshuffle between builds.")
     else:

@@ -35,6 +35,10 @@ def _strip_temperature(payload: dict) -> dict:
     return out
 
 
+class Timeout(ProviderError):
+    """The request went out and no reply came back in time."""
+
+
 def _send(url: str, payload: dict, headers: dict, timeout: int) -> dict:
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")
@@ -45,7 +49,17 @@ def _send(url: str, payload: dict, headers: dict, timeout: int) -> dict:
         detail = e.read().decode("utf-8", "replace")[:500]
         raise ProviderError(f"{e.code} from {url}: {detail}") from None
     except urllib.error.URLError as e:
+        # A timeout during connect arrives wrapped in URLError; one during the
+        # read arrives bare, below. Both are the same thing to a caller.
+        if isinstance(e.reason, TimeoutError):
+            raise Timeout(f"no reply from {url} within {timeout}s") from None
         raise ProviderError(f"could not reach {url}: {e.reason}") from None
+    except TimeoutError:
+        raise Timeout(f"no reply from {url} within {timeout}s") from None
+    except OSError as e:
+        # A dropped connection is a network fact, not a bug in the harness, and
+        # it should read like one rather than as seventy lines of traceback.
+        raise ProviderError(f"network error talking to {url}: {e}") from None
 
 
 def _post(url: str, payload: dict, headers: dict, timeout: int = 180) -> dict:
@@ -64,7 +78,7 @@ def _post(url: str, payload: dict, headers: dict, timeout: int = 180) -> dict:
     if url in TEMPERATURE_REFUSED:
         payload = _strip_temperature(payload)
     try:
-        return _send(url, payload, headers, timeout)
+        return _attempt(url, payload, headers, timeout)
     except ProviderError as e:
         refused = "temperature" in str(e).lower() and url not in TEMPERATURE_REFUSED
         if not refused:
@@ -72,7 +86,22 @@ def _post(url: str, payload: dict, headers: dict, timeout: int = 180) -> dict:
         TEMPERATURE_REFUSED.add(url)
         print("  note: this model refuses temperature, so runs cannot be pinned "
               "— read the spread from --repeat, not a single run")
-        return _send(url, _strip_temperature(payload), headers, timeout)
+        return _attempt(url, _strip_temperature(payload), headers, timeout)
+
+
+def _attempt(url: str, payload: dict, headers: dict, timeout: int) -> dict:
+    """Send once, and send again if nothing came back in time.
+
+    A timeout says the reply was slow, not that the request was wrong, and a
+    grouping call over a hundred items is slow enough to be caught by a bad
+    minute on either end. One retry is the difference between a flaky network
+    and an afternoon of re-running by hand.
+    """
+    try:
+        return _send(url, payload, headers, timeout)
+    except Timeout as e:
+        print(f"  {e} — trying once more")
+        return _send(url, payload, headers, timeout)
 
 
 def _need(var: str) -> str:
