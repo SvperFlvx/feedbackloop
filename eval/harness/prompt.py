@@ -30,13 +30,21 @@ not three themes.
 
 Rules:
 - Every item must be assigned to exactly one theme. Never drop an item.
-- A theme must contain items from at least two different people.
-- The test for one theme: a single change to the product would address all of
-  it. If it would take two unrelated changes, it is two themes.
+- A theme needs at least three items from three different people. Fewer than
+  that is one person's opinion, and its reach is too small for anyone to act on.
+- One theme is one thing an owner could decide to address. Not one engineering
+  task: slow loading and stuttering scrolling are different work and the same
+  finding.
+- If two candidate themes would be described in the same sentence, they are one
+  theme. When you are unsure, choose the larger theme.
+- An owner reads these ranked and acts on the top few. Much past a dozen themes
+  is a list rather than a finding, and splitting a hundred items nineteen ways
+  leaves every theme too small to be worth a row.
 - Never name a theme after a screen, a feature or a defect category. A name like
   "Checkout problems" is both a screen and a category and is wrong twice.
 - A theme that holds everything about one area of the app is a container, not a
-  theme. Split it by what each person was trying to do.
+  theme. Split a container by what people were trying to do — never by which
+  screen they were on, and never by which fix it would take.
 - The summary states what people said. It must not assert why, or what to build.
 
 Each theme carries two names:
