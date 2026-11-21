@@ -5,15 +5,27 @@ known-correct grouping. Point it at a provider, get a number, compare.
 
 Plain `python3`, no dependencies, no install.
 
+## Your key goes in a file, not the terminal
+
+Copy `eval/.env.example` to `eval/.env`, open it in any text editor, paste your
+key after the `=` sign, and save. The harness finds it on its own.
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Do this rather than typing `export` at a prompt. A key pasted into a terminal
+ends up in shell history and in scrollback, and leaks the moment you paste that
+scrollback somewhere to ask about an error. `.env` is gitignored.
+
 ## Run it
 
 ```bash
-# offline baseline — no API key needed
+# offline baseline — no key needed
 python3 eval/harness/run.py --provider mock --model screens-baseline
 
 # a real candidate
-export OPENAI_API_KEY=...
-python3 eval/harness/run.py --provider openai --model <model> --repeat 3
+python3 eval/harness/run.py --provider anthropic --model <model> --repeat 3
 
 # compare everything you have run
 python3 eval/harness/run.py --compare eval/results/*.json
@@ -98,7 +110,8 @@ eval/
   dataset/items.json     the 94 items. Edit or replace freely
   harness/metrics.py     scoring, with a self-test: python3 eval/harness/metrics.py
   harness/prompt.py      the prompt, shared by every provider so the test is fair
-  harness/providers.py   adapters. Keys from env, never written to disk
+  harness/providers.py   adapters, one per provider
+  .env                   your keys. Gitignored, never printed, never committed
   harness/run.py         the runner
   results/               one JSON per run, with scores and raw output
 ```
