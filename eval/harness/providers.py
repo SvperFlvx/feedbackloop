@@ -106,8 +106,11 @@ def anthropic(model: str, system: str, user: str) -> str:
     data = _post(
         "https://api.anthropic.com/v1/messages",
         {
+            # Headroom, not a guess: each theme now carries a label, a sentence,
+            # a summary and its item ids, and a reply cut off mid-JSON is
+            # indistinguishable from a model that cannot follow the format.
             "model": model,
-            "max_tokens": 8000,
+            "max_tokens": 16000,
             "temperature": 0,
             "system": system,
             "messages": [{"role": "user", "content": user}],
@@ -116,7 +119,16 @@ def anthropic(model: str, system: str, user: str) -> str:
          "anthropic-version": "2023-06-01",
          "Content-Type": "application/json"},
     )
-    return "".join(b.get("text", "") for b in data.get("content", []))
+    blocks = data.get("content", [])
+    text = "".join(b.get("text", "") for b in blocks if b.get("type") != "thinking")
+    if not text.strip():
+        # An empty reply and an unparseable one look the same downstream, so say
+        # which this was and what the API gave instead of text.
+        kinds = ", ".join(sorted({b.get("type", "?") for b in blocks})) or "none"
+        raise ProviderError(
+            f"no text in the reply. stop_reason={data.get('stop_reason')}, "
+            f"block types={kinds}, blocks={len(blocks)}")
+    return text
 
 
 def google(model: str, system: str, user: str) -> str:

@@ -115,12 +115,28 @@ def parse_themes(raw: str) -> dict[str, str]:
     return out
 
 
+class ParseFailure(Exception):
+    """A reply that arrived but could not be read, carrying the reply itself.
+
+    Throwing away the text and printing "no JSON object in response" leaves
+    nobody able to tell a truncated reply from a refusal from a model that
+    wrapped its answer in an apology. The reply is the evidence; keep it.
+    """
+
+    def __init__(self, message: str, raw: str):
+        super().__init__(message)
+        self.raw = raw
+
+
 def run_once(provider: str, model: str, items) -> tuple[dict[str, str], str, float]:
     payload = strip_gold(items)
     started = time.time()
     raw = providers.call(provider, model, prompt.SYSTEM, prompt.user_message(payload))
     elapsed = time.time() - started
-    return parse_themes(raw), raw, elapsed
+    try:
+        return parse_themes(raw), raw, elapsed
+    except (ValueError, json.JSONDecodeError) as e:
+        raise ParseFailure(str(e), raw) from None
 
 
 def main() -> int:
@@ -154,11 +170,22 @@ def main() -> int:
     items = load_items()
     gold = {it["id"]: it["gold_theme"] for it in items}
     runs, raws = [], []
+    out_dir = ROOT / "results"
+    stamp = time.strftime("%Y%m%d-%H%M%S")
 
     for n in range(args.repeat):
         try:
             pred, raw, elapsed = run_once(args.provider, args.model, items)
-        except (providers.ProviderError, ValueError, json.JSONDecodeError) as e:
+        except ParseFailure as e:
+            out_dir.mkdir(exist_ok=True)
+            dump = out_dir / f"unparsed-{stamp}-run{n + 1}.txt"
+            dump.write_text(e.raw)
+            print(f"run {n + 1} returned a reply that could not be read: {e}",
+                  file=sys.stderr)
+            print(f"  {len(e.raw)} characters saved to {dump}", file=sys.stderr)
+            print(f"  first 300: {e.raw[:300]!r}", file=sys.stderr)
+            return 1
+        except providers.ProviderError as e:
             print(f"run {n + 1} failed: {e}", file=sys.stderr)
             return 1
         s = metrics.score(pred, gold)
@@ -178,9 +205,7 @@ def main() -> int:
             "stdev": round(statistics.stdev(vals), 4) if len(vals) > 1 else 0.0,
         }
 
-    out_dir = ROOT / "results"
     out_dir.mkdir(exist_ok=True)
-    stamp = time.strftime("%Y%m%d-%H%M%S")
     safe = re.sub(r"[^a-zA-Z0-9]+", "-", f"{args.provider}-{args.model}").strip("-")
     out = out_dir / f"{safe}-{stamp}.json"
     out.write_text(json.dumps({
