@@ -70,6 +70,13 @@ hollow-dot encoding says a theme has gone quiet. If a model reshuffles its
 themes every time it runs, both break — an owner sees colours move and themes
 appear to vanish when nothing changed. A spread above 0.05 gets a warning.
 
+Every adapter asks for temperature 0, and newer models refuse the parameter
+outright. The harness notices, drops it, and says so. The consequence is worth
+stating plainly: on those models we cannot hold the output still, so a single
+run tells you nothing about stability and `--repeat` stops being optional. A
+candidate that scores well once and reshuffles on the next run is disqualified
+by the two decisions above, however good the number looked.
+
 ## A rule about the data
 
 **Real customer feedback never goes in `dataset/items.json`.**

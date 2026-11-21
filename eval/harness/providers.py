@@ -23,7 +23,19 @@ class ProviderError(RuntimeError):
     pass
 
 
-def _post(url: str, payload: dict, headers: dict, timeout: int = 180) -> dict:
+TEMPERATURE_REFUSED: set[str] = set()
+
+
+def _strip_temperature(payload: dict) -> dict:
+    out = {k: v for k, v in payload.items() if k != "temperature"}
+    config = out.get("generationConfig")
+    if isinstance(config, dict):
+        out["generationConfig"] = {k: v for k, v in config.items()
+                                   if k != "temperature"}
+    return out
+
+
+def _send(url: str, payload: dict, headers: dict, timeout: int) -> dict:
     body = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=body, headers=headers, method="POST")
     try:
@@ -34,6 +46,33 @@ def _post(url: str, payload: dict, headers: dict, timeout: int = 180) -> dict:
         raise ProviderError(f"{e.code} from {url}: {detail}") from None
     except urllib.error.URLError as e:
         raise ProviderError(f"could not reach {url}: {e.reason}") from None
+
+
+def _post(url: str, payload: dict, headers: dict, timeout: int = 180) -> dict:
+    """POST, and drop temperature if the model refuses it.
+
+    Every adapter asks for temperature 0 because a grouping that changes
+    between identical runs breaks two things downstream: a theme keeps its
+    colour across builds, and a hollow dot means a theme went quiet. Newer
+    models reject the parameter outright rather than ignoring it.
+
+    When that happens the request is retried once without it and the model is
+    remembered, so the cost is one wasted call per process rather than per run.
+    The retry is a fallback, not a preference: output from a model that would
+    not be pinned is less stable, and --repeat is what measures the damage.
+    """
+    if url in TEMPERATURE_REFUSED:
+        payload = _strip_temperature(payload)
+    try:
+        return _send(url, payload, headers, timeout)
+    except ProviderError as e:
+        refused = "temperature" in str(e).lower() and url not in TEMPERATURE_REFUSED
+        if not refused:
+            raise
+        TEMPERATURE_REFUSED.add(url)
+        print("  note: this model refuses temperature, so runs cannot be pinned "
+              "— read the spread from --repeat, not a single run")
+        return _send(url, _strip_temperature(payload), headers, timeout)
 
 
 def _need(var: str) -> str:
