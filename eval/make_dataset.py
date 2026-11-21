@@ -1,13 +1,18 @@
-"""Generates the fixed evaluation set: 94 items across 7 themes and 10 screens.
+"""How items.json was born: 94 items across 10 screens.
 
-The counts match the dataset used throughout the Figma prototype, so scores here
-are comparable to what the comps show. Run this once to produce items.json, then
-edit that file directly — or replace it wholesale with real feedback when you
-have some. The harness only reads items.json; this script is just how it was born.
+items.json is the source of truth, not this script. The harness only reads that
+file, and the gold grouping in it was re-cut by hand on 21 November 2026 when
+the original seven themes turned out to be feature areas rather than user
+intents — two of them were containers holding three unrelated problems each.
+
+The theme labels in ROWS below are the SUPERSEDED ones. Running this script
+would undo the re-cut, so it refuses to overwrite an existing items.json. Edit
+items.json directly, or delete it deliberately if you really mean to start over.
 """
 
 import json
 import pathlib
+import sys
 
 PEOPLE = [
     "Maya Chen", "Jon Bell", "Aisha Patel", "Lewis Morgan", "Tess Howard",
@@ -146,6 +151,12 @@ def build():
 if __name__ == "__main__":
     items = build()
     out = pathlib.Path(__file__).parent / "dataset" / "items.json"
+    if out.exists():
+        sys.exit(
+            f"{out} already exists and this script would overwrite it with the\n"
+            "superseded seven-theme grouping. items.json is the source of truth.\n"
+            "Delete it first if you genuinely mean to start the fixture over."
+        )
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(items, indent=2) + "\n")
 

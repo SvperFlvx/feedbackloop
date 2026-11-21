@@ -152,7 +152,9 @@ def mock(model: str, system: str, user: str) -> str:
         m = re.match(r"^(i\d+) \| screen: ([^|]+) \|", line.strip())
         if m:
             by_screen.setdefault(m.group(2).strip(), []).append(m.group(1))
-    themes = [{"name": f"{s} feedback", "summary": f"Items reported on {s}.",
+    themes = [{"name": f"{s} feedback",
+               "statement": f"Something about the {s} screen.",
+               "summary": f"Items reported on {s}.",
                "item_ids": ids} for s, ids in by_screen.items()]
     return json.dumps({"themes": themes})
 

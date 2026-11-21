@@ -35,15 +35,42 @@ Providers: `mock`, `openai`, `anthropic`, `google`, `groq`. Anything speaking th
 OpenAI chat-completions shape works through the `openai` adapter by changing
 `base_url` in `providers.py` — one line, no new code.
 
-## The number to beat: 0.573
+## The number to beat: 0.568
 
 The `mock` provider doesn't call anything. It groups items by which screen they
 came from, which is a strategy you could implement in an afternoon with a
-`GROUP BY`. It scores **V-measure 0.573**.
+`GROUP BY`. It scores **V-measure 0.568**.
 
-That is the floor. A model that doesn't clearly beat 0.573 is not worth paying
+That is the floor. A model that doesn't clearly beat 0.568 is not worth paying
 for, because grouping by screen is free. Treat it as the first question you ask
 of any candidate rather than a curiosity.
+
+## The reference grouping was re-cut, and you should distrust it
+
+On 21 November 2026 the gold grouping in `dataset/items.json` was rebuilt. The
+original seven themes were feature areas wearing theme names: "Checkout feels
+confusing" held 18 items covering three unrelated problems — not knowing the
+price, not knowing whether an action landed, and losing your place — and was
+named after a screen plus a feeling. The ten themes there now are user intents,
+which is the settled definition: *a theme is something a person was trying to do
+that the product made hard*, and intents cross screens.
+
+**Read this before trusting a score.** The re-cut was made after reading one
+model's output, which disagreed with the old grouping and turned out to be right.
+The new grouping was drawn from the items rather than copied, and in the
+checkout and payment region it still lands close to where that model landed —
+partly because the items fall that way, and partly because whoever re-cut it had
+already seen the answer. So the reference is not independent of the first
+candidate scored against it, and that candidate's score is flattered by an
+unknown amount.
+
+Two consequences. A score above roughly 0.9 from the model that prompted the
+re-cut should be read as agreement, not as quality. And every number recorded
+before this date is void — including the old 0.573 floor and the 0.828 that
+settled the provider. Re-run anything you want to quote.
+
+The honest fix is a reference drawn from real feedback a real owner grouped. One
+design partner's build replaces all of this reasoning with evidence.
 
 ## What the scores mean
 
@@ -99,27 +126,31 @@ feedback is messier: half-sentences, two complaints in one breath, references to
 things said on a call. Replace `dataset/items.json` with real items as soon as
 you have them — the harness only reads that file.
 
-**The reference grouping is one opinion.** It is the grouping we designed the
-views around, not a ground truth. A model that scores 0.8 against it might be
-grouping in a defensible way that differs. Read the themes before concluding a
-candidate is wrong.
+**The reference grouping is one opinion**, and it has already been wrong once —
+see the re-cut above. It is the grouping the views were designed around, not a
+ground truth. A model that scores 0.8 against it might be grouping in a
+defensible way that differs, and that disagreement is worth more attention than
+the score: run `inspect_run.py` and read where it splits before concluding the
+candidate is the thing at fault.
 
-**Names are not scored.** Nothing here can tell you whether "Payment confidence"
-reads better than "Payment issues", and that wording is a large part of what an
-owner is paying for. Every run saves the raw output next to the scores so you
-can read the names yourself.
+**Names are not scored.** Nothing here can tell you whether "Cost clarity" reads
+better than "Pricing problems", and that wording is a large part of what an owner
+is paying for. Each theme now carries two: a short `name` that has to fit a
+matrix column header, and a first-person `statement` for the detail view. Neither
+is measured. `inspect_run.py` prints them so you can judge them yourself.
 
 ## Files
 
 ```
 eval/
-  make_dataset.py        regenerates dataset/items.json
-  dataset/items.json     the 94 items. Edit or replace freely
+  make_dataset.py        how items.json was born. Refuses to overwrite it
+  dataset/items.json     the 94 items and the gold grouping. The source of truth
   harness/metrics.py     scoring, with a self-test: python3 eval/harness/metrics.py
   harness/prompt.py      the prompt, shared by every provider so the test is fair
   harness/providers.py   adapters, one per provider
   .env                   your keys. Gitignored, never printed, never committed
   harness/run.py         the runner
+  harness/inspect_run.py theme names, and which reference themes they split
   results/               one JSON per run, with scores and raw output
 ```
 
