@@ -152,7 +152,7 @@ async function rpc(fn, body) {
     const me = await rpc("capture_open", { p_token: TOKEN });
     $("greet").textContent = `Hi ${me.label}.`;
     const sel = $("screen");
-    const screens = (me.screens && me.screens.length) ? me.screens : ["The app"];
+    const screens = inFlowOrder((me.screens && me.screens.length) ? me.screens : ["The app"]);
     sel.innerHTML = screens.map(s => `<option>${s.replace(/</g, "&lt;")}</option>`).join("");
     sel.onchange = paintScreen;
     paintScreen();
@@ -167,9 +167,23 @@ async function rpc(fn, body) {
 // cannot drift apart: a screen with no frame shows the tap hint rather than a
 // broken box.
 const FRAMES = {
-  "Store page — Add-Ons": "frames/addons.jpg",
-  "Add-on detail": "frames/addon-detail.jpg"
+  "All deals": "frames/all-deals.jpg",
+  "Game page — About": "frames/game-about.jpg",
+  "Game page — Add-Ons": "frames/addons.jpg",
+  "Add-on detail": "frames/addon-detail.jpg",
+  "Accessibility features": "frames/accessibility.jpg",
+  "Confirm purchase": "frames/confirm-purchase.jpg"
 };
+// capture_open returns screens alphabetically, which scatters a flow. Order by
+// the map above instead, so the list reads the way someone would walk it, and
+// leave anything unrecognised at the end rather than dropping it.
+function inFlowOrder(names) {
+  const order = Object.keys(FRAMES);
+  return names.slice().sort((a, b) => {
+    const ia = order.indexOf(a), ib = order.indexOf(b);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || a.localeCompare(b);
+  });
+}
 function paintScreen() {
   const name = $("screen").value;
   const src = FRAMES[name];
