@@ -42,11 +42,11 @@
 
   /* The screen. A placeholder frame until the real prototype images are in:
      swapping it is one line, and the marker maths is already fractional. */
-  #stage { position: relative; width: 100%; aspect-ratio: 9 / 19.5;
-    background: #1e222b;
+  #stage { position: relative; width: 100%; aspect-ratio: 750 / 1630;
+    background: #0b0c10;
     border: 1px solid var(--line); border-radius: 12px; overflow: hidden;
     touch-action: manipulation; }
-  #stage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  #stage img { width: 100%; height: 100%; object-fit: contain; display: block; }
   #stage .hint { position: absolute; inset: 0; display: grid; place-content: center;
     text-align: center; color: var(--soft); font-size: 14px; padding: 24px; }
   #pin { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px;
@@ -163,9 +163,13 @@ async function rpc(fn, body) {
   }
 })();
 
-// Real prototype frames drop in here, keyed by screen name. Until then the
-// stage is an empty frame and the marker still records where it was tapped.
-const FRAMES = {};
+// Keyed by the screen names capture_open returns, so the database and the page
+// cannot drift apart: a screen with no frame shows the tap hint rather than a
+// broken box.
+const FRAMES = {
+  "Store page — Add-Ons": "frames/addons.jpg",
+  "Add-on detail": "frames/addon-detail.jpg"
+};
 function paintScreen() {
   const name = $("screen").value;
   const src = FRAMES[name];
