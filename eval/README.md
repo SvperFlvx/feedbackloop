@@ -69,6 +69,11 @@ re-cut should be read as agreement, not as quality. And every number recorded
 before this date is void — including the old 0.573 floor and the 0.828 that
 settled the provider. Re-run anything you want to quote.
 
+Haiku 5.5 scores **0.884 mean, spread 0.025, coverage 1.000** against the re-cut
+fixture, at 11 to 13 themes. That is the number to beat, and it carries the
+caveat above: it is higher than the 0.828 it scored against the original fixture
+partly because the fixture now agrees with it.
+
 The honest fix is a reference drawn from real feedback a real owner grouped. One
 design partner's build replaces all of this reasoning with evidence.
 
