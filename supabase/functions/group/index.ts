@@ -51,7 +51,20 @@ async function db(path: string, init: RequestInit = {}) {
   return res;
 }
 
+// Anything thrown below became a bare 500 with nothing in the logs, which is
+// how a missing table grant looked for an hour. An unexpected failure should
+// say what it was.
 Deno.serve(async (req) => {
+  try {
+    return await run(req);
+  } catch (e) {
+    const why = e instanceof Error ? e.message : String(e);
+    console.error("grouping failed", why);
+    return fail(500, why);
+  }
+});
+
+async function run(req: Request): Promise<Response> {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return fail(405, "POST only");
 
@@ -151,4 +164,4 @@ Deno.serve(async (req) => {
     dropped: dropped.length,            // never zero quietly: dropping feedback is the worst failure
     names: resolved.map((t: any) => t.name),
   }), { headers: { ...cors, "content-type": "application/json" } });
-});
+}
