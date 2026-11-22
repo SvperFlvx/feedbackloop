@@ -70,14 +70,24 @@
   .dot.open { background: #0f4a92; }
   /* The note shows at the dot. A panel below the frame meant scrolling away
      from the thing you tapped, which defeats the point of anchoring it. */
-  .bubble { position: absolute; z-index: 6; max-width: 76%; min-width: 150px;
+  /* Left is set in pixels after measuring, so a dot near either margin cannot
+     push the note off the frame. The caret is moved to keep pointing at the
+     dot once the body has been clamped. */
+  .bubble { position: absolute; z-index: 6; max-width: 76%; min-width: 170px;
     background: rgba(13,14,18,.96); color: var(--ink); border: 1px solid #39405130;
-    border-radius: 12px; padding: 10px 12px; font-size: 13.5px; line-height: 1.4;
-    box-shadow: 0 10px 28px rgba(0,0,0,.55); transform: translateX(-50%);
+    border-radius: 12px; padding: 10px 12px; font-size: 15.5px; line-height: 1.42;
+    box-shadow: 0 10px 28px rgba(0,0,0,.55);
     max-height: 42%; overflow: auto; -webkit-overflow-scrolling: touch; }
-  .bubble b { display: block; color: var(--soft); font-weight: 600;
-    font-size: 11.5px; letter-spacing: .02em; margin-bottom: 4px; }
-  .bubble:after { content: ""; position: absolute; left: 50%; margin-left: -7px;
+  .bubble b { color: var(--soft); font-weight: 600;
+    font-size: 13.5px; letter-spacing: .02em; }
+  .bubble .head { display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-bottom: 5px; }
+  .bubble .bin { flex: none; width: 34px; height: 34px; margin: -7px -6px -7px 0;
+    border: 0; background: transparent; color: var(--soft); cursor: pointer;
+    border-radius: 8px; display: grid; place-content: center; }
+  .bubble .bin:hover, .bubble .bin:focus-visible { color: #ff9c9c; background: #ffffff12; }
+  .bubble .bin svg { width: 17px; height: 17px; }
+  .bubble:after { content: ""; position: absolute; left: var(--caret, 50%);
     border: 7px solid transparent; }
   .bubble.below:after { top: -14px; border-bottom-color: rgba(13,14,18,.96); }
   .bubble.above:after { bottom: -14px; border-top-color: rgba(13,14,18,.96); }
@@ -266,20 +276,56 @@ function showBubble(dot, number, note) {
   const b = document.createElement("div");
   b.className = "bubble";
   b.dataset.id = String(note.id);
-  const head = document.createElement("b");
-  head.textContent = `Note ${number}${note.typed ? " · typed" : ""}`;
+
+  const head = document.createElement("div");
+  head.className = "head";
+  const title = document.createElement("b");
+  title.textContent = `Note ${number}${note.typed ? " · typed" : ""}`;
+  const bin = document.createElement("button");
+  bin.className = "bin";
+  bin.title = "Delete this note";
+  bin.setAttribute("aria-label", "Delete this note");
+  bin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6"/></svg>';
+  bin.onclick = ev => { ev.stopPropagation(); removeNote(note, bin); };
+  head.append(title, bin);
+
   const body = document.createElement("div");
   body.textContent = note.transcript || "(a recording with no transcript)";
   b.append(head, body);
 
   const low = note.y > 0.58;
   b.classList.add(low ? "above" : "below");
-  b.style.left = `${Math.min(88, Math.max(12, note.x * 100))}%`;
   if (low) b.style.bottom = `${(1 - note.y) * 100 + 4}%`;
   else b.style.top = `${note.y * 100 + 4}%`;
+  b.style.left = "0px";
+  $("stage").appendChild(b);
+
+  // Measured, then clamped in pixels: clamping the centre point was not
+  // enough, because a wide note on an edge dot still ran off the frame.
+  const stageW = $("stage").clientWidth;
+  const want = note.x * stageW - b.offsetWidth / 2;
+  const left = Math.max(10, Math.min(want, stageW - b.offsetWidth - 10));
+  b.style.left = `${left}px`;
+  const caret = Math.max(12, Math.min(note.x * stageW - left, b.offsetWidth - 12));
+  b.style.setProperty("--caret", `${caret - 7}px`);
 
   dot.classList.add("open");
-  $("stage").appendChild(b);
+}
+
+async function removeNote(note, bin) {
+  bin.disabled = true;
+  try {
+    await rpc("capture_delete", { p_token: TOKEN, p_note: note.id });
+    sent = sent.filter(n => n.id !== note.id);
+    hideBubble();
+    drawDots();
+    sayCount();
+  } catch (e) {
+    bin.disabled = false;
+    oops(e.message || "Couldn't delete that one.");
+  }
 }
 
 function hideBubble() {
