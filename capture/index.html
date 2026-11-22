@@ -300,6 +300,18 @@ async function transcribe() {
 function ready() {
   const words = ($("trans").value || $("typed").value || "").trim();
   $("send").disabled = !(blob || words);
+  labelSend();
+}
+
+// A wrong transcript is worse than a missing one: it does not fail, it quietly
+// produces a theme about the wrong thing. The first person to use this page
+// shipped "game trailer" where the screen said "Game Trial", with the
+// correction box open in front of him. So when there is something to check,
+// the button asks him to have checked it — reading becomes the precondition
+// rather than an extra task.
+function labelSend() {
+  const hasHeard = !!blob && !!$("trans").value.trim();
+  $("send").textContent = hasHeard ? "Looks right — send" : "Send it";
 }
 $("trans").oninput = ready;
 $("typed").oninput = ready;
@@ -337,7 +349,7 @@ $("send").onclick = async () => {
     oops(e.message || "That didn't send. Try again.");
     $("send").disabled = false;
   }
-  $("send").textContent = "Send it";
+  labelSend();
 };
 
 $("more").onclick = () => {
