@@ -119,6 +119,32 @@
 <main>
   <div id="boot" class="card">Opening your link…</div>
 
+  <!-- Orienting, deliberately not priming: how it works, never what to notice.
+       No mention of prices, checkout, icons or anything else we half-expect
+       someone to say, because a tester who is told what we are interested in
+       obligingly finds it. -->
+  <div id="intro" class="hidden">
+    <h1 id="hello"></h1>
+    <div class="card">
+      <p style="margin:2px 0 14px">You're looking at six screens from the
+        PlayStation Store app on iPhone. Nothing here is ours — we just want to
+        know what you make of it.</p>
+      <ol style="margin:0 0 14px; padding-left: 20px; line-height: 1.7">
+        <li>Tap anything on the screen that bugs you.</li>
+        <li>Press record and say what's wrong, out loud.</li>
+        <li>Check what we heard, then send it.</li>
+      </ol>
+      <p style="margin:0 0 14px">As many or as few as you like — two minutes is
+        plenty. There's no wrong answer and nothing you can break.</p>
+      <p class="note" style="margin:0 0 16px"><b style="color:var(--ink)">This
+        records your voice.</b> The recording is stored in Canada and sent to a
+        US service to be written down, under terms that forbid training on it;
+        both delete it within 30 days. Your phone will ask permission the first
+        time you press record.</p>
+      <button id="begin" style="width:100%;background:var(--accent);font-size:17px">Start</button>
+    </div>
+  </div>
+
   <div id="app" class="hidden">
     <h1 id="greet"></h1>
     <p class="sub">Tap the thing that bugs you, then say what's wrong.</p>
@@ -198,7 +224,18 @@ async function rpc(fn, body) {
     sel.onchange = paintScreen;
     paintScreen();
     $("boot").classList.add("hidden");
-    $("app").classList.remove("hidden");
+    // Someone who has already left a note knows how this works. No data to
+    // store and nothing to remember: notes_so_far already tells us.
+    if (sent.length === 0) {
+      $("hello").textContent = `Hi ${me.label}.`;
+      $("intro").classList.remove("hidden");
+      $("begin").onclick = () => {
+        $("intro").classList.add("hidden");
+        $("app").classList.remove("hidden");
+      };
+    } else {
+      $("app").classList.remove("hidden");
+    }
   } catch (e) {
     $("boot").textContent = e.message || "That link didn't work.";
   }
