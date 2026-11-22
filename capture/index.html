@@ -52,9 +52,26 @@
   #stage img { width: 100%; height: 100%; object-fit: contain; display: block; }
   #stage .hint { position: absolute; inset: 0; display: grid; place-content: center;
     text-align: center; color: var(--soft); font-size: 14px; padding: 24px; }
-  #pin { position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px;
-    border-radius: 50%; border: 2px solid #fff; background: rgba(42,120,214,.78);
-    display: none; pointer-events: none; }
+  /* The draft is deliberately bigger, hollow and pulsing: it has to read as
+     unfinished at a glance, so moving it reads as repositioning this note
+     rather than as losing one. */
+  #pin { position: absolute; width: 38px; height: 38px; margin: -19px 0 0 -19px;
+    border-radius: 50%; border: 3px dashed #fff; background: rgba(42,120,214,.28);
+    box-shadow: 0 0 0 2px rgba(0,0,0,.35); display: none; pointer-events: none;
+    animation: breathe 1.8s ease-in-out infinite; }
+  @keyframes breathe { 50% { transform: scale(1.12); } }
+  @media (prefers-reduced-motion: reduce) { #pin { animation: none; } }
+
+  /* Sent notes: small, solid, numbered, and tappable to re-read. */
+  .dot { position: absolute; width: 24px; height: 24px; margin: -12px 0 0 -12px;
+    border-radius: 50%; background: var(--mark); border: 2px solid #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,.45); color: #fff; font-size: 12px;
+    font-weight: 700; display: grid; place-content: center; cursor: pointer; }
+  .dot.open { background: #0f4a92; }
+  #said { margin-top: 10px; padding: 11px 12px; background: #10131a;
+    border: 1px solid var(--line); border-radius: 10px; font-size: 14px; }
+  #said b { color: var(--soft); font-weight: 600; font-size: 12.5px;
+    display: block; margin-bottom: 4px; }
 
   select, textarea, button { font: inherit; color: var(--ink); }
   select, textarea { width: 100%; background: #10131a; border: 1px solid var(--line);
@@ -95,6 +112,7 @@
         <div id="pin"></div>
       </div>
       <div class="meta"><span id="pinned">No spot marked yet</span></div>
+      <div id="said" class="hidden"></div>
     </div>
 
     <div class="card sticky">
@@ -123,11 +141,6 @@
       deleted there within 30 days.</p>
   </div>
 
-  <div id="done" class="card ok hidden">
-    <b>Got it — thank you.</b>
-    <span class="note" id="donecount"></span>
-    <button id="more" style="margin-top:18px;width:100%">Leave another</button>
-  </div>
 </main>
 
 <script>
@@ -137,6 +150,7 @@ const TOKEN = new URLSearchParams(location.search).get("t") || "";
 
 const $ = id => document.getElementById(id);
 let mark = null, blob = null, mime = "", rec = null, chunks = [], started = 0, tick = null;
+let sent = [];   // this person's notes, so the dots survive a reload
 
 function oops(m) { $("err").textContent = m; $("err").classList.remove("hidden"); }
 function clearOops() { $("err").classList.add("hidden"); }
@@ -158,6 +172,7 @@ async function rpc(fn, body) {
   if (!TOKEN) { $("boot").textContent = "This link is missing its code. Ask for a new one."; return; }
   try {
     const me = await rpc("capture_open", { p_token: TOKEN });
+    sent = me.notes || [];
     $("greet").textContent = `Hi ${me.label}.`;
     const sel = $("screen");
     const screens = inFlowOrder((me.screens && me.screens.length) ? me.screens : ["The app"]);
@@ -205,7 +220,49 @@ function paintScreen() {
   } else {
     $("stagehint").classList.remove("hidden");
   }
-  mark = null; $("pin").style.display = "none"; $("pinned").textContent = "No spot marked yet";
+  mark = null; $("pin").style.display = "none";
+  $("said").classList.add("hidden");
+  drawDots();
+  sayCount();
+}
+
+// Sent notes become small numbered dots where they were left. The screenshot
+// itself becomes the list: four dots means four notes, and you can see which
+// parts of the screen you have already talked about.
+function drawDots() {
+  [...document.querySelectorAll(".dot")].forEach(d => d.remove());
+  const here = sent.filter(n => n.screen === $("screen").value && n.x !== null);
+  here.forEach((n, i) => {
+    const d = document.createElement("div");
+    d.className = "dot";
+    d.style.left = `${n.x * 100}%`;
+    d.style.top = `${n.y * 100}%`;
+    d.textContent = String(i + 1);
+    d.title = "Tap to see what you said here";
+    d.onclick = ev => {
+      ev.stopPropagation();           // a dot tap must not also move the draft
+      [...document.querySelectorAll(".dot")].forEach(o => o.classList.remove("open"));
+      d.classList.add("open");
+      $("said").innerHTML = "";
+      const head = document.createElement("b");
+      head.textContent = `Note ${i + 1} on this screen`;
+      const body = document.createElement("div");
+      body.textContent = n.transcript || "(a recording with no transcript)";
+      $("said").append(head, body);
+      $("said").classList.remove("hidden");
+    };
+    $("stage").appendChild(d);
+  });
+}
+
+function sayCount() {
+  const here = sent.filter(n => n.screen === $("screen").value).length;
+  const all = sent.length;
+  $("pinned").textContent = mark
+    ? "Spot marked — move it by tapping somewhere else"
+    : here ? `${here} note${here === 1 ? "" : "s"} on this screen, ${all} in total — tap a dot to re-read, or tap anywhere to add another`
+           : all ? `${all} note${all === 1 ? "" : "s"} so far — tap the thing that bugs you`
+                 : "No spot marked yet";
 }
 
 // ---- marker -----------------------------------------------------------
@@ -216,8 +273,8 @@ $("stage").addEventListener("click", ev => {
   mark = { x: +x.toFixed(4), y: +y.toFixed(4) };
   const pin = $("pin");
   pin.style.left = `${x * 100}%`; pin.style.top = `${y * 100}%`; pin.style.display = "block";
-  $("pinned").textContent = "Spot marked — move it by tapping somewhere else";
   $("stagehint").classList.add("hidden");
+  sayCount();
   ready();
 });
 
@@ -329,7 +386,7 @@ $("send").onclick = async () => {
   try {
     const typed = $("typed").value.trim();
     const heard = $("trans").value.trim();
-    await rpc("capture_submit", {
+    const id = await rpc("capture_submit", {
       p_token: TOKEN,
       p_screen: $("screen").value,
       p_marker_x: mark ? mark.x : null,
@@ -339,12 +396,22 @@ $("send").onclick = async () => {
       p_transcript: heard || typed || null,
       p_typed: !blob && !!typed
     });
-    const me = await rpc("capture_open", { p_token: TOKEN }).catch(() => null);
-    $("donecount").textContent = me
-      ? `That's ${me.notes_so_far} note${me.notes_so_far === 1 ? "" : "s"} from you.`
-      : "";
-    $("app").classList.add("hidden");
-    $("done").classList.remove("hidden");
+    // The note is filed. It becomes a dot where it was left, and the draft
+    // clears — no separate confirmation screen to come back from, because
+    // leaving several notes in a row is the normal case, not the exception.
+    sent.push({
+      id, screen: $("screen").value,
+      x: mark ? mark.x : null, y: mark ? mark.y : null,
+      transcript: heard || typed || null, typed: !blob && !!typed
+    });
+    resetDraft();
+    drawDots();
+    sayCount();
+    const here = sent.filter(n => n.screen === $("screen").value).length;
+    $("err").className = "note";
+    $("err").textContent = `Saved. That's ${here} on this screen.`;
+    $("err").classList.remove("hidden");
+    setTimeout(() => { $("err").classList.add("hidden"); $("err").className = "err hidden"; }, 3500);
   } catch (e) {
     oops(e.message || "That didn't send. Try again.");
     $("send").disabled = false;
@@ -352,15 +419,17 @@ $("send").onclick = async () => {
   labelSend();
 };
 
-$("more").onclick = () => {
+function resetDraft() {
   blob = null; mark = null; chunks = [];
+  $("pin").style.display = "none";
   $("trans").value = ""; $("typed").value = "";
-  $("transwrap").classList.add("hidden"); $("again").classList.add("hidden");
+  $("transwrap").classList.add("hidden");
+  $("again").classList.add("hidden");
+  $("said").classList.add("hidden");
   $("timer").textContent = "Up to about four minutes";
   $("rec").textContent = "Hold the thought — record";
-  $("done").classList.add("hidden"); $("app").classList.remove("hidden");
-  paintScreen(); ready();
-};
+  ready();
+}
 </script>
 </body>
 </html>
