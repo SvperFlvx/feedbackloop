@@ -68,10 +68,19 @@
     box-shadow: 0 1px 6px rgba(0,0,0,.45); color: #fff; font-size: 12px;
     font-weight: 700; display: grid; place-content: center; cursor: pointer; }
   .dot.open { background: #0f4a92; }
-  #said { margin-top: 10px; padding: 11px 12px; background: #10131a;
-    border: 1px solid var(--line); border-radius: 10px; font-size: 14px; }
-  #said b { color: var(--soft); font-weight: 600; font-size: 12.5px;
-    display: block; margin-bottom: 4px; }
+  /* The note shows at the dot. A panel below the frame meant scrolling away
+     from the thing you tapped, which defeats the point of anchoring it. */
+  .bubble { position: absolute; z-index: 6; max-width: 76%; min-width: 150px;
+    background: rgba(13,14,18,.96); color: var(--ink); border: 1px solid #39405130;
+    border-radius: 12px; padding: 10px 12px; font-size: 13.5px; line-height: 1.4;
+    box-shadow: 0 10px 28px rgba(0,0,0,.55); transform: translateX(-50%);
+    max-height: 42%; overflow: auto; -webkit-overflow-scrolling: touch; }
+  .bubble b { display: block; color: var(--soft); font-weight: 600;
+    font-size: 11.5px; letter-spacing: .02em; margin-bottom: 4px; }
+  .bubble:after { content: ""; position: absolute; left: 50%; margin-left: -7px;
+    border: 7px solid transparent; }
+  .bubble.below:after { top: -14px; border-bottom-color: rgba(13,14,18,.96); }
+  .bubble.above:after { bottom: -14px; border-top-color: rgba(13,14,18,.96); }
 
   select, textarea, button { font: inherit; color: var(--ink); }
   select, textarea { width: 100%; background: #10131a; border: 1px solid var(--line);
@@ -112,7 +121,6 @@
         <div id="pin"></div>
       </div>
       <div class="meta"><span id="pinned">No spot marked yet</span></div>
-      <div id="said" class="hidden"></div>
     </div>
 
     <div class="card sticky">
@@ -221,7 +229,7 @@ function paintScreen() {
     $("stagehint").classList.remove("hidden");
   }
   mark = null; $("pin").style.display = "none";
-  $("said").classList.add("hidden");
+  hideBubble();
   drawDots();
   sayCount();
 }
@@ -241,18 +249,42 @@ function drawDots() {
     d.title = "Tap to see what you said here";
     d.onclick = ev => {
       ev.stopPropagation();           // a dot tap must not also move the draft
-      [...document.querySelectorAll(".dot")].forEach(o => o.classList.remove("open"));
-      d.classList.add("open");
-      $("said").innerHTML = "";
-      const head = document.createElement("b");
-      head.textContent = `Note ${i + 1} on this screen`;
-      const body = document.createElement("div");
-      body.textContent = n.transcript || "(a recording with no transcript)";
-      $("said").append(head, body);
-      $("said").classList.remove("hidden");
+      showBubble(d, i + 1, n);
     };
     $("stage").appendChild(d);
   });
+}
+
+// Anchored to the dot, flipped above it when the dot sits low, and clamped
+// so a dot near an edge does not push the note off the frame.
+function showBubble(dot, number, note) {
+  const open = document.querySelector(".bubble");
+  const same = open && open.dataset.id === String(note.id);
+  hideBubble();
+  if (same) return;                   // tapping the same dot again closes it
+
+  const b = document.createElement("div");
+  b.className = "bubble";
+  b.dataset.id = String(note.id);
+  const head = document.createElement("b");
+  head.textContent = `Note ${number}${note.typed ? " · typed" : ""}`;
+  const body = document.createElement("div");
+  body.textContent = note.transcript || "(a recording with no transcript)";
+  b.append(head, body);
+
+  const low = note.y > 0.58;
+  b.classList.add(low ? "above" : "below");
+  b.style.left = `${Math.min(88, Math.max(12, note.x * 100))}%`;
+  if (low) b.style.bottom = `${(1 - note.y) * 100 + 4}%`;
+  else b.style.top = `${note.y * 100 + 4}%`;
+
+  dot.classList.add("open");
+  $("stage").appendChild(b);
+}
+
+function hideBubble() {
+  document.querySelector(".bubble")?.remove();
+  [...document.querySelectorAll(".dot")].forEach(d => d.classList.remove("open"));
 }
 
 function sayCount() {
@@ -267,6 +299,7 @@ function sayCount() {
 
 // ---- marker -----------------------------------------------------------
 $("stage").addEventListener("click", ev => {
+  if (document.querySelector(".bubble")) { hideBubble(); return; }
   const box = ev.currentTarget.getBoundingClientRect();
   const x = (ev.clientX - box.left) / box.width, y = (ev.clientY - box.top) / box.height;
   if (x < 0 || x > 1 || y < 0 || y > 1) return;
@@ -425,7 +458,7 @@ function resetDraft() {
   $("trans").value = ""; $("typed").value = "";
   $("transwrap").classList.add("hidden");
   $("again").classList.add("hidden");
-  $("said").classList.add("hidden");
+  hideBubble();
   $("timer").textContent = "Up to about four minutes";
   $("rec").textContent = "Hold the thought — record";
   ready();
