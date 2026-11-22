@@ -1,0 +1,17 @@
+# DreamHost defaults to Cache-Control: max-age=600, which means an edit to the
+# page takes up to ten minutes to reach a phone that already loaded it. That
+# cost us two rounds of "it didn't work" that were really "you are looking at
+# the old one", and it would silently put two testers on two different versions
+# of the page, which makes their findings unattributable.
+#
+# The page itself must always be revalidated. The frames are content-addressed
+# in practice — they only change when the screens change — so they keep a long
+# cache and stay fast on a phone.
+
+<FilesMatch "\.html$">
+  Header set Cache-Control "no-cache, must-revalidate"
+</FilesMatch>
+
+<FilesMatch "\.(jpg|jpeg|png|webp)$">
+  Header set Cache-Control "public, max-age=604800"
+</FilesMatch>
