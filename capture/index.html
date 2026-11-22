@@ -37,6 +37,9 @@
   p.sub { color: var(--soft); font-size: 14px; margin: 0 0 18px; }
   .card { background: var(--panel); border: 1px solid var(--line);
     border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+  .card.sticky { position: sticky; bottom: calc(8px + env(safe-area-inset-bottom));
+    z-index: 5; background: rgba(23,26,33,.97); backdrop-filter: blur(8px);
+    box-shadow: 0 -20px 30px -14px rgba(0,0,0,.9); }
   label.field { display: block; font-size: 13px; color: var(--soft);
     margin-bottom: 8px; }
 
@@ -94,7 +97,7 @@
       <div class="meta"><span id="pinned">No spot marked yet</span></div>
     </div>
 
-    <div class="card">
+    <div class="card sticky">
       <div class="row">
         <button id="rec">Hold the thought — record</button>
         <button id="again" class="hidden">Redo</button>
@@ -104,15 +107,20 @@
         <label class="field" for="trans">What we heard — fix anything that's wrong</label>
         <textarea id="trans" placeholder="Your words will appear here"></textarea>
       </div>
-      <p class="note" id="typehint">Prefer to type? Record nothing and just write it below.</p>
-      <div id="typewrap" style="margin-top:4px">
-        <textarea id="typed" placeholder="Or type it here instead"></textarea>
-      </div>
       <button id="send" disabled>Send it</button>
       <div id="err" class="err hidden"></div>
     </div>
-    <p class="note">Your recording is stored in Canada. It's transcribed by a US
-      service under terms that forbid training on it, and deleted there within 30 days.</p>
+
+    <div class="card">
+      <p class="note" id="typehint" style="margin-top:0">Prefer to type? Record
+        nothing and write it here instead.</p>
+      <div id="typewrap" style="margin-top:8px">
+        <textarea id="typed" placeholder="Or type it here instead"></textarea>
+      </div>
+    </div>
+    <p class="note" style="margin-bottom:18px">Your recording is stored in Canada.
+      It's transcribed by a US service under terms that forbid training on it, and
+      deleted there within 30 days.</p>
   </div>
 
   <div id="done" class="card ok hidden">
